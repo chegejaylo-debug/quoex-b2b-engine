@@ -661,9 +661,11 @@ export default function AlibabaLayout() {
             </div>
           </div>
         </main>
-      ) : (
-        /* CORE MARKETPLACE B2B BROWSING ENGINE (DEFAULT) */
+      
+        ) : (
+        {/* CORE MARKETPLACE B2B BROWSING ENGINE (DEFAULT) */}
         <main className="max-w-7xl mx-auto px-4 py-6">
+
           
           {/* HERO CORPORATE MARKETING BANNER HUB */}
           <div className="w-full h-44 sm:h-56 bg-gray-900 rounded-2xl relative overflow-hidden mb-8 shadow-md border border-gray-800 flex items-center px-6 md:px-12">
