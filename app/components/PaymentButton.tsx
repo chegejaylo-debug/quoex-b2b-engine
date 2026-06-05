@@ -13,6 +13,7 @@ export default function PaymentButton({
 
   useEffect(() => {
     // load SDK only in browser
+    // @ts-ignore
     import("intasend-inlinejs-sdk").then(() => {
       setLoaded(true);
     });
