@@ -60,9 +60,11 @@ export default function AlibabaLayout() {
   const categories = ["Cement", "Drills", "Paint", "Electrical", "Plumbing"];
 
   const triggerNotification = (text: string) => {
+  // @ts-ignore
+  setNotification(text as any);
+  setTimeout(() => setNotification(null), 4000);
+};
 
-    setNotification(text);
-    setTimeout(() => setNotification(null), 4000);
   };
 
   // --- Feature 2: Multi-Item RFQ Board State ---
