@@ -59,7 +59,8 @@ export default function AlibabaLayout() {
   const [isAdminEditing, setIsAdminEditing] = useState(false);
   const categories = ["Cement", "Drills", "Paint", "Electrical", "Plumbing"];
 
-  const triggerNotification = (text) => {
+  const triggerNotification = (text: string) => {
+
     setNotification(text);
     setTimeout(() => setNotification(null), 4000);
   };
