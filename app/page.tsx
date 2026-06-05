@@ -516,13 +516,13 @@ export default function AlibabaLayout() {
               </h2>
               <p className="text-xs text-gray-500 mt-0.5">Real-time inventory configurations, price tiers, and structural catalog mapping utilities.</p>
             </div>
-            <button 
-              onClick={fetchProducts} 
-              className="flex items-center gap-1.5 bg-white border text-xs font-bold px-3 py-1.5 rounded-lg shadow-xs hover:bg-gray-50 text-gray-700 transition"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-orange-500" : ""}`} /> Sync Database Tables
-            </button>
-          </div>
+           <button
+  onClick={fetchProducts}
+  className="flex items-center gap-1.5 bg-white border text-xs font-bold px-3 py-1.5 rounded-lg shadow-xs hover:bg-gray-50 text-gray-700 transition"
+>
+  <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-orange-500" : ""}`} /> 
+  Sync Database Tables
+</button>
 
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl shadow-sm border p-5 h-fit sticky top-24">
