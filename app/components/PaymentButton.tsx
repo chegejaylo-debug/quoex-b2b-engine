@@ -1,55 +1,21 @@
-"use client";
+import React from 'react';
 
-import { useEffect, useState } from "react";
+interface PayButtonProps {
+  onPay: () => void;
+  disabled?: boolean;
+  label?: string;
+}
 
-export default function PaymentButton({
-  amount,
-  email,
-}: {
-  amount: number;
-  email: string;
-}) {
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    // load SDK only in browser
-    // @ts-ignore
-    import("intasend-inlinejs-sdk").then(() => {
-      setLoaded(true);
-    });
-  }, []);
-
-  const handlePayment = () => {
-    if (!loaded) return;
-
-    // @ts-ignore
-    const IntaSend = (window as any).IntaSend;
-
-    const intasend = new IntaSend({
-      publicAPIKey: process.env.NEXT_PUBLIC_INTASEND_KEY,
-      live: false,
-    });
-
-    intasend
-      .checkout({
-        amount,
-        currency: "KES",
-        email,
-      })
-      .then((resp: any) => {
-        console.log("Payment success:", resp);
-      })
-      .catch((err: any) => {
-        console.log("Payment failed:", err);
-      });
-  };
-
+const PayButton: React.FC<PayButtonProps> = ({ onPay, disabled = false, label = 'Pay Now' }) => {
   return (
     <button
-      onClick={handlePayment}
-      className="w-full bg-orange-600 py-4 rounded-xl font-bold"
+      onClick={onPay}
+      disabled={disabled}
+      className={`bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
-      Pay KES {amount}
+      {label}
     </button>
   );
-}
+};
+
+export default PayButton;

@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import {
-  ShoppingCart, Star, Phone, Mail, MapPin, User, LogIn, UserPlus,
-  Search, Filter, SlidersHorizontal, Check, RefreshCw, X, Eye,
+import { 
+  ShoppingCart, Star, Phone, Mail, MapPin, User, LogIn, UserPlus, 
+  Search, Filter, SlidersHorizontal, Check, RefreshCw, X, Eye, 
   FileText, ArrowRight, Package, ShieldCheck, Truck, ChevronLeft, ChevronRight,
   Scale, MessageSquare, Download, Send, DollarSign, Building, Plus, Edit2, Trash2, Save, CheckCircle, ImageIcon
 } from "lucide-react";
@@ -12,30 +12,31 @@ import Image from "next/image";
 
 export default function AlibabaLayout() {
   // --- Core Base States ---
-  const [inventory, setInventory] = useState<any[]>([]);
+  const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const [error, setError] = useState(null);
+  
   // --- Filtering & Pagination States ---
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [sortBy, setSortBy] = useState("created_at-desc"); // FIX: was "id-desc", "id" is not a reliable sort field
+  const [sortBy, setSortBy] = useState("created_at-desc");
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 8;
 
   // --- Cart, Currency, & Logistics States ---
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState([]);
   const [showCartPreview, setShowCartPreview] = useState(false);
-  const [currency, setCurrency] = useState("KES");
-  const exchangeRate = 0.0077;
-
+  const [currency, setCurrency] = useState("KES"); 
+  const exchangeRate = 0.0077; // 1 KES = 0.0077 USD
+  
+  // Logistics Configurations
   const [selectedZone, setSelectedZone] = useState("Nyeri Hub");
-  const logisticsZones: Record<string, { baseFee: number; costPerKg: number }> = {
+  const logisticsZones = {
     "Nyeri Hub": { baseFee: 0, costPerKg: 2 },
     "Karatina Terminal": { baseFee: 1500, costPerKg: 5 },
     "Othaya Depot": { baseFee: 1200, costPerKg: 4.5 },
@@ -44,60 +45,61 @@ export default function AlibabaLayout() {
   };
 
   // --- Auth & User States ---
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [profile, setProfile] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("shop");
+  const [profile, setProfile] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState("shop"); // 'shop', 'dashboard', 'rfq-board', 'admin'
 
-  // --- Admin States ---
+  // --- Admin Dashboard Feature Operations ---
   const [actionLoading, setActionLoading] = useState(false);
-  const [notification, setNotification] = useState<string | null>(null);
-  const [adminForm, setAdminForm] = useState({ id: null as string | null, name: "", category: "Cement", price: "", image_url: "" });
+  const [notification, setNotification] = useState(null);
+  const [adminForm, setAdminForm] = useState({ id: null, name: "", category: "Cement", price: "", image_url: "" });
   const [isAdminEditing, setIsAdminEditing] = useState(false);
   const categories = ["Cement", "Drills", "Paint", "Electrical", "Plumbing"];
 
-  // FIX: Removed unnecessary @ts-ignore and redundant type cast
-  const triggerNotification = (text: string) => {
+  const triggerNotification = (text) => {
     setNotification(text);
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // --- RFQ State ---
+  // --- Feature 2: Multi-Item RFQ Board State ---
   const [rfqForm, setRfqForm] = useState({
     description: "",
     targetBudget: "",
     urgency: "Standard (3-5 Days)"
   });
 
-  // --- Chat State ---
+  // --- Feature 4: Live Chat Interface State ---
   const [showChat, setShowChat] = useState(false);
   const [chatMessages, setChatMessages] = useState([
-    { id: 1, sender: "agent", text: "Welcome to QUOEX B2B Sourcing Desk. Let us know if you need customized container volume discount pricing charts.", time: "Just Now" }
+    { id: 1, sender: "agent", text: "Welcome to Tony's Sourcing Desk. Let us know if you need customized container volume discount pricing charts.", time: "Just Now" }
   ]);
   const [currentMessage, setCurrentMessage] = useState("");
 
-  // --- UI States ---
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  // --- UI Interactive States ---
+  const [selectedProduct, setSelectedProduct] = useState(null); 
   const [singleRfqMessage, setSingleRfqMessage] = useState("");
 
-  // --- Derived ---
+  // --- Derived Calculations ---
   const totalPages = Math.ceil(totalCount / itemsPerPage) || 1;
 
-  const getTieredUnitPrice = (product: any, quantity: number) => {
+  // --- Wholesale Pricing Matrix Logic ---
+  const getTieredUnitPrice = (product, quantity) => {
     const base = product.price;
-    if (quantity >= 200) return base * 0.82;
-    if (quantity >= 50) return base * 0.90;
+    if (quantity >= 200) return base * 0.82; // 18% Off Wholesale Bulk Bracket
+    if (quantity >= 50) return base * 0.90;  // 10% Off Mid-Tier Volume Bracket
     return base;
   };
 
-  const getProductWeight = (product: any) => {
-    if (product.category === "Cement") return 50;
-    if (product.category === "Paint") return 20;
-    return 2;
+  const getProductWeight = (product) => {
+    if (product.category === "Cement") return 50; 
+    if (product.category === "Paint") return 20;  
+    return 2; 
   };
 
+  // --- Banners ---
   const banners = [
     { id: 1, image: "/banner1.jpg", text: "Verified B2B Procurement Hub & Factory-Direct Logistics" },
     { id: 2, image: "/banner2.jpg", text: "Volume-Tiered Pricing Models Optimized For Regional Contractors" }
@@ -127,7 +129,7 @@ export default function AlibabaLayout() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => { setUser(session?.user ?? null); });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => { setUser(session?.user ?? null); });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => { setUser(session?.user ?? null); });
     return () => subscription?.unsubscribe();
   }, []);
 
@@ -143,11 +145,13 @@ export default function AlibabaLayout() {
     }
   }, [user]);
 
+  // --- Central Query Inventory Master Function ---
   async function fetchProducts() {
     setLoading(true);
     try {
       let query = supabase.from("products").select("*", { count: "exact" });
-
+      
+      // Conditionally skip client filters if using full table management
       if (activeTab !== "admin") {
         if (debouncedSearch) query = query.ilike("name", `%${debouncedSearch}%`);
         if (category !== "All") query = query.eq("category", category);
@@ -157,7 +161,7 @@ export default function AlibabaLayout() {
 
       const [sortField, sortOrder] = sortBy.split("-");
       query = query.order(sortField, { ascending: sortOrder === "asc" });
-
+      
       if (activeTab !== "admin") {
         query = query.range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
       }
@@ -166,18 +170,31 @@ export default function AlibabaLayout() {
       if (err) throw err;
       setInventory(data || []);
       setTotalCount(count || 0);
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   }
+    useEffect(() => {
+  async function testSupabase() {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .limit(1);
 
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+  }
+
+  testSupabase();
+}, []);
   useEffect(() => {
     fetchProducts();
   }, [debouncedSearch, category, minPrice, maxPrice, sortBy, page, activeTab]);
 
-  const addToCart = (product: any) => {
+  // --- Cart System Operations ---
+  const addToCart = (product) => {
     setCart((prev) => {
       const existing = prev.find((p) => p.id === product.id);
       if (existing) {
@@ -188,8 +205,8 @@ export default function AlibabaLayout() {
     setShowCartPreview(true);
   };
 
-  const updateCartQuantity = (id: string, amount: number) => {
-    setCart((prev) =>
+  const updateCartQuantity = (id, amount) => {
+    setCart((prev) => 
       prev.map((item) => {
         if (item.id === id) {
           const nextQty = item.quantity + amount;
@@ -206,7 +223,8 @@ export default function AlibabaLayout() {
     setProfile(null);
   };
 
-  const handleAdminFormSubmit = async (e: React.FormEvent) => {
+  // --- Admin Dashboard Functions ---
+  const handleAdminFormSubmit = async (e) => {
     e.preventDefault();
     if (!adminForm.name || !adminForm.price) return triggerNotification("Please populate required parameters.");
 
@@ -230,14 +248,14 @@ export default function AlibabaLayout() {
       }
       resetAdminForm();
       fetchProducts();
-    } catch (err: any) {
+    } catch (err) {
       triggerNotification(`Mutation Error: ${err.message}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-  const enterAdminEditMode = (product: any) => {
+  const enterAdminEditMode = (product) => {
     setIsAdminEditing(true);
     setAdminForm({
       id: product.id,
@@ -248,7 +266,7 @@ export default function AlibabaLayout() {
     });
   };
 
-  const executeAdminDelete = async (id: string) => {
+  const executeAdminDelete = async (id) => {
     if (!window.confirm("Purge item permanently from live logistics database?")) return;
     setActionLoading(true);
     try {
@@ -256,7 +274,7 @@ export default function AlibabaLayout() {
       if (error) throw error;
       triggerNotification("Item successfully removed from warehouses.");
       fetchProducts();
-    } catch (err: any) {
+    } catch (err) {
       triggerNotification(`Purge Error: ${err.message}`);
     } finally {
       setActionLoading(false);
@@ -268,8 +286,9 @@ export default function AlibabaLayout() {
     setAdminForm({ id: null, name: "", category: "Cement", price: "", image_url: "" });
   };
 
+  // --- Advanced Aggregate Financial & Freight Computations ---
   const cartTotalWeight = cart.reduce((sum, item) => sum + (getProductWeight(item) * item.quantity), 0);
-
+  
   const totalItemsPriceKES = cart.reduce((sum, item) => {
     const currentUnitPrice = getTieredUnitPrice(item, item.quantity);
     return sum + (currentUnitPrice * item.quantity);
@@ -277,23 +296,24 @@ export default function AlibabaLayout() {
 
   const activeZoneConfig = logisticsZones[selectedZone] || { baseFee: 0, costPerKg: 0 };
   const freightCostKES = cart.length > 0 ? activeZoneConfig.baseFee + (cartTotalWeight * activeZoneConfig.costPerKg) : 0;
-  const aggregateVatKES = (totalItemsPriceKES + freightCostKES) * 0.16;
+  const aggregateVatKES = (totalItemsPriceKES + freightCostKES) * 0.16; 
   const overallInvoiceTotalKES = totalItemsPriceKES + freightCostKES + aggregateVatKES;
 
-  const formatPrice = (priceInKES: number) => {
+  const formatPrice = (priceInKES) => {
     if (currency === "USD") {
       return `$${(priceInKES * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
     }
     return `KES ${priceInKES.toLocaleString()}`;
   };
 
+  // --- Automated Dispatch Handlers ---
   const sendWhatsAppOrder = () => {
-    const itemsMarkdown = cart.map((item: any) => `* ${item.name}\n  _Qty:_ ${item.quantity} units @ ${formatPrice(getTieredUnitPrice(item, item.quantity))} ea`).join("\n");
-    const dynamicMessage = `*COMMERCIAL PURCHASE REQUEST: QUOEX B2B*\n\n*Logistics Destination:* ${selectedZone}\n*Consignee Profile:* ${profile?.name || user?.email || "Verified Procurement Partner"}\n\n*Manifest Breakdowns:*\n${itemsMarkdown}\n\n*Payload Mass Metrics:* ${cartTotalWeight} KG\n*Net Wholesale Cost:* ${formatPrice(totalItemsPriceKES)}\n*Freight Surcharge:* ${formatPrice(freightCostKES)}\n*Corporate VAT (16%):* ${formatPrice(aggregateVatKES)}\n*Gross Payable Total:* ${formatPrice(overallInvoiceTotalKES)}\n\n_Auto-generated invoice pipeline._`;
+    const itemsMarkdown = cart.map(item => `* ${item.name}\n  _Qty:_ ${item.quantity} units @ ${formatPrice(getTieredUnitPrice(item, item.quantity))} ea`).join("\n");
+    const dynamicMessage = `*COMMERCIAL PURCHASE REQUEST: TONY'S GLOBAL*\n\n*Logistics Destination:* ${selectedZone}\n*Consignee Profile:* ${profile?.name || user?.email || "Verified Procurement Partner"}\n\n*Manifest Breakdowns:*\n${itemsMarkdown}\n\n*Payload Mass Metrics:* ${cartTotalWeight} KG\n*Net Wholesale Cost:* ${formatPrice(totalItemsPriceKES)}\n*Freight Surcharge:* ${formatPrice(freightCostKES)}\n*Corporate VAT (16%):* ${formatPrice(aggregateVatKES)}\n*Gross Payable Total:* ${formatPrice(overallInvoiceTotalKES)}\n\n_Auto-generated invoice pipeline._`;
     window.open(`https://wa.me/254757528133?text=${encodeURIComponent(dynamicMessage)}`, "_blank");
   };
 
-  const submitGlobalRfqBoardForm = (e: React.FormEvent) => {
+  const submitGlobalRfqBoardForm = (e) => {
     e.preventDefault();
     if (!rfqForm.description) return alert("Please specify procurement resource requirements.");
     const trackingNo = "RFQ-" + Math.floor(Math.random() * 90000 + 10000);
@@ -302,7 +322,7 @@ export default function AlibabaLayout() {
     setActiveTab("shop");
   };
 
-  const executeChatMessageSend = (e: React.FormEvent) => {
+  const executeChatMessageSend = (e) => {
     e.preventDefault();
     if (!currentMessage.trim()) return;
     setChatMessages(prev => [...prev, { id: Date.now(), sender: "buyer", text: currentMessage, time: "Just now" }]);
@@ -314,8 +334,8 @@ export default function AlibabaLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased selection:bg-orange-500 selection:text-white print:bg-white print:text-black">
-
-      {/* GLOBAL ALERTS */}
+      
+      {/* GLOBAL HUD GLOBAL ALERTS */}
       {notification && (
         <div className="fixed top-4 right-4 z-50 bg-gray-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl border border-gray-800 flex items-center gap-2 animate-slideUp">
           <CheckCircle className="w-4 h-4 text-orange-400 shrink-0" />
@@ -323,7 +343,7 @@ export default function AlibabaLayout() {
         </div>
       )}
 
-      {/* HEADER UTILITY BAR */}
+      {/* HEADER UTILITY SYSTEM BAR */}
       <div className="bg-gray-900 text-gray-400 text-[11px] py-2 px-4 border-b border-gray-800 font-medium print:hidden">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex space-x-6 items-center">
@@ -331,7 +351,7 @@ export default function AlibabaLayout() {
             <span className="flex items-center gap-1"><Truck className="w-3.5 h-3.5" /> Direct Site Freight Fleet</span>
           </div>
           <div className="flex items-center space-x-4">
-            <button
+            <button 
               onClick={() => setCurrency(currency === "KES" ? "USD" : "KES")}
               className="hover:text-white font-bold transition bg-gray-800 px-2.5 py-0.5 rounded border border-gray-700 text-orange-400"
             >
@@ -342,28 +362,29 @@ export default function AlibabaLayout() {
         </div>
       </div>
 
-      {/* HEADER */}
+      {/* CORE DYNAMIC HEADER CONTROL PLATFORM */}
       <header className="w-full py-4 px-4 sticky top-0 z-40 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 shadow-md print:hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-
+          
           <div className="flex items-center justify-between w-full md:w-auto gap-4">
             <div className="cursor-pointer" onClick={() => { setActiveTab("shop"); setCategory("All"); }}>
               <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
                 TONY'S <span className="bg-gray-900 text-orange-400 px-2 py-0.5 rounded text-lg font-black shadow-md">GLOBAL</span>
               </h1>
-              <p className="text-[9px] text-orange-100 font-bold tracking-widest uppercase">INTELLIGENT B2B PROCUREMENT ENGINE</p>
+              <p className="text-[9px] text-orange-100 font-bold tracking-widest uppercase">Verified B2B Supply Network</p>
             </div>
-
+            
             <div className="flex items-center gap-2 md:hidden">
               {cart.length > 0 && (
                 <button onClick={() => setShowCartPreview(!showCartPreview)} className="bg-white p-2 rounded-full text-orange-600 relative">
                   <ShoppingCart className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{cart.reduce((a: number, c: any) => a + c.quantity, 0)}</span>
+                  <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{cart.reduce((a,c)=>a+c.quantity,0)}</span>
                 </button>
               )}
             </div>
           </div>
 
+          {/* Search Processing Hub */}
           <div className="w-full md:max-w-lg flex items-center bg-white rounded-lg shadow-inner overflow-hidden border border-orange-200">
             <div className="pl-3 text-gray-400"><Search className="w-4 h-4" /></div>
             <input
@@ -376,30 +397,44 @@ export default function AlibabaLayout() {
             {search && <button onClick={() => setSearch("")} className="p-2 text-gray-400"><X className="w-3.5 h-3.5" /></button>}
           </div>
 
+          {/* Core App Navigation Controls */}
           <nav className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-            <button onClick={() => setActiveTab("shop")} className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap ${activeTab === "shop" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}>
+            <button 
+              onClick={() => setActiveTab("shop")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap ${activeTab === "shop" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}
+            >
               Marketplace Catalogs
             </button>
-            <button onClick={() => setActiveTab("rfq-board")} className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap flex items-center gap-1 ${activeTab === "rfq-board" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}>
+            <button 
+              onClick={() => setActiveTab("rfq-board")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap flex items-center gap-1 ${activeTab === "rfq-board" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}
+            >
               <FileText className="w-3.5 h-3.5 text-orange-300" /> Global RFQ Board
             </button>
-            <button onClick={() => setActiveTab("dashboard")} className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap flex items-center gap-1 ${activeTab === "dashboard" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}>
+            <button 
+              onClick={() => setActiveTab("dashboard")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap flex items-center gap-1 ${activeTab === "dashboard" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}
+            >
               <Building className="w-3.5 h-3.5" /> Procurement Console
             </button>
-            <button onClick={() => setActiveTab("admin")} className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap flex items-center gap-1 ${activeTab === "admin" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}>
+            <button 
+              onClick={() => setActiveTab("admin")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap flex items-center gap-1 ${activeTab === "admin" ? "bg-gray-900 text-white shadow" : "text-white hover:bg-orange-600"}`}
+            >
               <SlidersHorizontal className="w-3.5 h-3.5 text-orange-200" /> Control Desk
             </button>
+            
             {user ? (
               <button onClick={handleLogout} className="bg-gray-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-700 transition">Logout</button>
             ) : (
               <button onClick={() => setShowLoginModal(true)} className="bg-white text-orange-600 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-gray-50 transition shadow-sm">Sign In</button>
             )}
           </nav>
+
         </div>
       </header>
 
-      {/* ======================== TAB RENDER SWITCH ======================== */}
-
+      {/* RENDER SWITCH BOARD FRAMEWORKS */}
       {activeTab === "rfq-board" ? (
         <main className="max-w-4xl mx-auto px-4 py-10 print:hidden">
           <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 md:p-8">
@@ -408,6 +443,7 @@ export default function AlibabaLayout() {
               <h2 className="text-2xl font-black text-gray-900 mt-0.5">Submit Multi-Item Supply Requirements</h2>
               <p className="text-xs text-gray-500 mt-1">Specify custom compounds or multi-SKU layouts. Agents respond within 120 minutes.</p>
             </div>
+
             <form onSubmit={submitGlobalRfqBoardForm} className="space-y-4">
               <div>
                 <label className="text-xs font-black text-gray-700 block mb-1">Comprehensive Manifest Requirements Details</label>
@@ -416,9 +452,10 @@ export default function AlibabaLayout() {
                   placeholder="Example: Sourcing 400 bags of Portland Cement grade 42.5R..."
                   className="w-full border border-gray-200 rounded-lg p-3 text-xs bg-gray-50 focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none h-32 resize-none"
                   value={rfqForm.description}
-                  onChange={(e) => setRfqForm({ ...rfqForm, description: e.target.value })}
+                  onChange={(e) => setRfqForm({...rfqForm, description: e.target.value})}
                 />
               </div>
+
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-black text-gray-700 block mb-1">Target Procurement Cap Budget ({currency})</label>
@@ -427,7 +464,7 @@ export default function AlibabaLayout() {
                     placeholder="e.g. 500,000"
                     className="w-full border border-gray-200 p-2.5 text-xs rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 bg-gray-50"
                     value={rfqForm.targetBudget}
-                    onChange={(e) => setRfqForm({ ...rfqForm, targetBudget: e.target.value })}
+                    onChange={(e) => setRfqForm({...rfqForm, targetBudget: e.target.value})}
                   />
                 </div>
                 <div>
@@ -435,7 +472,7 @@ export default function AlibabaLayout() {
                   <select
                     className="w-full border border-gray-200 p-2.5 text-xs rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-1 focus:ring-orange-500"
                     value={rfqForm.urgency}
-                    onChange={(e) => setRfqForm({ ...rfqForm, urgency: e.target.value })}
+                    onChange={(e) => setRfqForm({...rfqForm, urgency: e.target.value})}
                   >
                     <option>Urgent Dispatch Needed (Within 24 Hours)</option>
                     <option>Standard (3-5 Days)</option>
@@ -443,25 +480,26 @@ export default function AlibabaLayout() {
                   </select>
                 </div>
               </div>
+
               <button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-black py-3 rounded-lg uppercase tracking-wider transition shadow-md">
                 Broadcast Manifest to Supplier Engine
               </button>
             </form>
           </div>
         </main>
-
       ) : activeTab === "dashboard" ? (
         <main className="max-w-7xl mx-auto px-4 py-10 print:hidden">
           <div className="bg-white rounded-xl shadow-md border p-6">
             <h2 className="text-xl font-black text-gray-900 border-b pb-2 mb-4">Enterprise Buyer Dashboard</h2>
             <p className="text-xs text-gray-500">Corporate Account: <span className="font-bold text-gray-700">{user?.email || "Guest Procurement Profile"}</span></p>
+            
             <div className="mt-6">
               <h3 className="text-sm font-bold text-gray-800 mb-3">Historical Proforma Manifest Logs</h3>
               {orders.length === 0 ? (
                 <p className="text-xs text-gray-400 bg-gray-50 p-4 rounded-lg border border-dashed">No execution statements logged.</p>
               ) : (
                 <div className="space-y-2">
-                  {orders.map((o: any) => (
+                  {orders.map(o => (
                     <div key={o.id} className="p-4 border rounded-xl bg-gray-50/50 flex justify-between items-center text-xs">
                       <div>
                         <p className="font-black text-gray-900">{o.id} ({o.date})</p>
@@ -478,26 +516,23 @@ export default function AlibabaLayout() {
             </div>
           </div>
         </main>
-
       ) : activeTab === "admin" ? (
-        /* ADMIN PANEL */
-        // FIX: Was missing closing </main> tag and the grid was placed outside the main tag
+        /* CORE ADMIN INVENTORY CONTROLLER PANEL */
         <main className="max-w-7xl mx-auto px-4 py-8 print:hidden">
           <div className="border-b pb-4 mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-2xl font-black tracking-tight text-gray-900 flex items-center gap-2">
-                QUOEX B2BL <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded uppercase font-black tracking-wider">Control Console</span>
+                TONY'S GLOBAL <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded uppercase font-black tracking-wider">Control Console</span>
               </h2>
               <p className="text-xs text-gray-500 mt-0.5">Real-time inventory configurations, price tiers, and structural catalog mapping utilities.</p>
             </div>
-            <button
-              onClick={fetchProducts}
+            <button 
+              onClick={fetchProducts} 
               className="flex items-center gap-1.5 bg-white border text-xs font-bold px-3 py-1.5 rounded-lg shadow-xs hover:bg-gray-50 text-gray-700 transition"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-orange-500" : ""}`} />
-              Sync Database Tables
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-orange-500" : ""}`} /> Sync Database Tables
             </button>
-          </div>{/* FIX: closing tag for the flex header row was missing */}
+          </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl shadow-sm border p-5 h-fit sticky top-24">
@@ -524,6 +559,7 @@ export default function AlibabaLayout() {
                     onChange={(e) => setAdminForm({ ...adminForm, name: e.target.value })}
                   />
                 </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs font-black text-gray-700 block mb-1">Trade Bracket</label>
@@ -552,6 +588,7 @@ export default function AlibabaLayout() {
                     </div>
                   </div>
                 </div>
+
                 <div>
                   <label className="text-xs font-black text-gray-700 block mb-1">Image URL (Optional)</label>
                   <div className="relative flex items-center">
@@ -565,10 +602,13 @@ export default function AlibabaLayout() {
                     />
                   </div>
                 </div>
+
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className={`w-full text-white text-xs font-black py-2.5 rounded-lg uppercase tracking-wider shadow-md transition flex justify-center items-center gap-1.5 ${isAdminEditing ? "bg-amber-500 hover:bg-amber-600" : "bg-orange-500 hover:bg-orange-600"} disabled:opacity-50`}
+                  className={`w-full text-white text-xs font-black py-2.5 rounded-lg uppercase tracking-wider shadow-md transition flex justify-center items-center gap-1.5 ${
+                    isAdminEditing ? "bg-amber-500 hover:bg-amber-600" : "bg-orange-500 hover:bg-orange-600"
+                  } disabled:opacity-50`}
                 >
                   {isAdminEditing ? <Save className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                   {isAdminEditing ? "Commit Entry Changes" : "Deploy Item Live"}
@@ -610,15 +650,33 @@ export default function AlibabaLayout() {
                                     <Package className="w-4 h-4 text-gray-400" />
                                   )}
                                 </div>
-                                <span>{product.name}</span>
+                                <span className="truncate max-w-[180px] sm:max-w-xs">{product.name}</span>
                               </div>
                             </td>
-                            <td className="py-3.5 px-4"><span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-bold text-[10px] uppercase">{product.category}</span></td>
-                            <td className="py-3.5 px-4 font-extrabold text-gray-900">{formatPrice(product.price)}</td>
                             <td className="py-3.5 px-4">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button onClick={() => enterAdminEditMode(product)} className="p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"><Edit2 className="w-3.5 h-3.5" /></button>
-                                <button onClick={() => executeAdminDelete(product.id)} className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><Trash2 className="w-3.5 h-3.5" /></button>
+                              <span className="bg-orange-50 text-orange-700 font-extrabold px-2 py-0.5 rounded text-[10px] border border-orange-100 uppercase tracking-wide">
+                                {product.category}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 font-mono font-bold text-gray-700">
+                              KES {product.price.toLocaleString()}
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center justify-center space-x-1.5">
+                                <button
+                                  onClick={() => enterAdminEditMode(product)}
+                                  disabled={actionLoading}
+                                  className="p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded border transition"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => executeAdminDelete(product.id)}
+                                  disabled={actionLoading}
+                                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded border transition"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             </td>
                           </tr>
@@ -631,330 +689,183 @@ export default function AlibabaLayout() {
             </div>
           </div>
         </main>
-
       ) : (
-        /* DEFAULT SHOP TAB */
-        <main className="max-w-7xl mx-auto px-4 py-6">
-
-          {/* HERO BANNER */}
-          <div className="w-full h-44 sm:h-56 bg-gray-900 rounded-2xl relative overflow-hidden mb-8 shadow-md border border-gray-800 flex items-center px-6 md:px-12">
-            <div className="z-10 max-w-xl">
-              <span className="bg-orange-500 text-white text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded shadow">Global Distribution Channels</span>
-              <h2 className="text-lg sm:text-2xl font-black text-white mt-2 leading-tight transition-all duration-500">{banners[bannerIndex].text}</h2>
-              <div className="flex items-center gap-4 mt-4">
-                <button onClick={() => setActiveTab("rfq-board")} className="bg-white text-gray-900 px-4 py-2 rounded-lg text-xs font-black hover:bg-orange-50 transition shadow-md flex items-center gap-1">Instant RFQ Sourcing <ArrowRight className="w-3 h-3" /></button>
-                <span className="text-[10px] text-gray-400 font-bold hidden sm:inline-block">✓ Direct Factory Delivery Agreements Matrix</span>
-              </div>
+        /* STANDARD PUBLIC SHOP VIEW */
+        <>
+          <section className="w-full h-40 relative bg-gray-900 overflow-hidden shadow-inner flex items-center print:hidden">
+            <div className="absolute inset-0 bg-cover bg-center opacity-30 scale-105 transition duration-1000" style={{ backgroundImage: `url(${banners[bannerIndex].image})` }} />
+            <div className="max-w-7xl mx-auto px-6 relative z-10 text-white">
+              <h2 className="text-2xl md:text-3xl font-black max-w-xl leading-tight">{banners[bannerIndex].text}</h2>
+              <p className="text-xs text-orange-300 font-bold mt-1 tracking-wide uppercase">Integrated Volume Matrices Configured System-Wide</p>
             </div>
-            <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-gradient-to-l from-orange-600/20 to-transparent hidden md:block" />
-          </div>
+          </section>
 
-          <div className="grid lg:grid-cols-4 gap-8">
-            {/* SIDEBAR FILTERS */}
-            <aside className="space-y-6 lg:block hidden">
-              <div className="bg-white rounded-xl border p-5 shadow-sm">
-                <h3 className="font-black text-xs text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-1.5"><Filter className="w-3.5 h-3.5 text-orange-500" /> Filter Criteria</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-[11px] font-black text-gray-700 block mb-1 uppercase tracking-wider">Industrial Categories</label>
-                    <div className="space-y-1">
-                      {["All", ...categories].map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => { setCategory(cat); setPage(1); }}
-                          className={`w-full text-left text-xs px-2.5 py-1.5 rounded-lg transition font-medium ${category === cat ? "bg-orange-50 text-orange-700 font-black" : "text-gray-600 hover:bg-gray-50"}`}
-                        >
-                          {cat} {cat === "All" ? "Inventory" : "Supplies"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="border-t pt-4">
-                    <label className="text-[11px] font-black text-gray-700 block mb-1 uppercase tracking-wider">Unit Pricing Caps ({currency})</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input type="number" placeholder="Min" className="w-full bg-gray-50 border p-2 text-xs rounded-lg focus:outline-none" value={minPrice} onChange={(e) => { setMinPrice(e.target.value); setPage(1); }} />
-                      <input type="number" placeholder="Max" className="w-full bg-gray-50 border p-2 text-xs rounded-lg focus:outline-none" value={maxPrice} onChange={(e) => { setMaxPrice(e.target.value); setPage(1); }} />
-                    </div>
-                  </div>
-                  <div className="border-t pt-4">
-                    <label className="text-[11px] font-black text-gray-700 block mb-1 uppercase tracking-wider">Database Indexing</label>
-                    <select className="w-full bg-gray-50 border p-2 text-xs rounded-lg text-gray-600 focus:outline-none font-medium" value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(1); }}>
-                      <option value="created_at-desc">Newest Components First</option>
-                      <option value="price-asc">Base Rate: Low to High</option>
-                      <option value="price-desc">Base Rate: High to Low</option>
-                      <option value="name-asc">Alphabetical: A-Z</option>
-                    </select>
-                  </div>
+          <section className="max-w-7xl mx-auto px-4 py-8 print:hidden">
+            <div className="flex flex-col lg:flex-row gap-6">
+              
+              <aside className="w-full lg:w-60 shrink-0 bg-white border border-gray-100 p-4 rounded-xl shadow-sm h-fit space-y-6">
+                <div className="border-b pb-2 flex justify-between items-center">
+                  <h3 className="font-black text-xs text-gray-900 uppercase tracking-wider">Sourcing Parameters</h3>
                 </div>
-              </div>
-            </aside>
 
-            {/* PRODUCT GRID */}
-            <div className="lg:col-span-3 space-y-6">
-              <div className="flex justify-between items-center bg-white p-3 rounded-xl border shadow-xs lg:hidden">
-                <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-1.5 text-xs font-black text-gray-700 bg-gray-100 px-3 py-2 rounded-lg">
-                  <SlidersHorizontal className="w-3.5 h-3.5" /> Discovery Setups
-                </button>
-                <span className="text-xs font-bold text-gray-500">{totalCount} Pipeline Records Loaded</span>
-              </div>
-
-              {showFilters && (
-                <div className="bg-white rounded-xl border p-4 space-y-4 shadow-sm lg:hidden animate-fadeIn">
-                  <div>
-                    <label className="text-xs font-black text-gray-700 block mb-1">Supplies Category</label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {["All", ...categories].map((cat) => (
-                        <button key={cat} onClick={() => { setCategory(cat); setPage(1); }} className={`px-2.5 py-1 rounded-md text-xs font-bold transition ${category === cat ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-600"}`}>{cat}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div>
-                      <label className="text-[10px] font-black text-gray-500 uppercase">Min Price</label>
-                      <input type="number" className="w-full border p-2 text-xs bg-gray-50 rounded-md" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-black text-gray-500 uppercase">Max Price</label>
-                      <input type="number" className="w-full border p-2 text-xs bg-gray-50 rounded-md" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
-                    </div>
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">Trade Bracket</h4>
+                  <div className="space-y-0.5">
+                    {["All", "Cement", "Drills", "Paint", "Electrical", "Plumbing"].map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => { setCategory(cat); setPage(1); }}
+                        className={`w-full text-left px-2 py-1.5 rounded text-xs transition flex justify-between items-center ${category === cat ? "bg-orange-50 font-black text-orange-600" : "text-gray-600 hover:bg-gray-50"}`}
+                      >
+                        <span>{cat}</span>
+                        {category === cat && <Check className="w-3.5 h-3.5" />}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
 
-              {loading ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-white border rounded-xl p-4 space-y-3 animate-pulse">
-                      <div className="w-full h-32 bg-gray-200 rounded-lg" />
-                      <div className="h-3 bg-gray-200 rounded w-3/4" />
-                      <div className="h-4 bg-gray-200 rounded w-1/2" />
-                    </div>
-                  ))}
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">Price Threshold ({currency})</h4>
+                  <div className="flex space-x-1">
+                    <input type="number" placeholder="Min" className="w-full border p-1.5 text-xs rounded bg-gray-50 outline-none focus:ring-1 focus:ring-orange-500" value={minPrice} onChange={e=>setMinPrice(e.target.value)}/>
+                    <input type="number" placeholder="Max" className="w-full border p-1.5 text-xs rounded bg-gray-50 outline-none focus:ring-1 focus:ring-orange-500" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)}/>
+                  </div>
                 </div>
-              ) : error ? (
-                <div className="text-center py-12 bg-red-50 text-red-600 rounded-xl border border-red-200 text-xs font-medium">
-                  Connection Pipeline Broken: {error}
+
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">Sort Sequence</h4>
+                  <select className="w-full border p-2 text-xs rounded bg-gray-50 text-gray-700 outline-none" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
+                    <option value="created_at-desc">Default Matrix</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                  </select>
                 </div>
-              ) : inventory.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-xl border border-dashed text-gray-400 text-xs font-medium">
-                  No catalog items found matching selected matrix fields.
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {inventory.map((product) => (
-                    <div key={product.id} className="bg-white rounded-xl border shadow-xs hover:shadow-md transition overflow-hidden flex flex-col group relative">
-                      <div className="w-full h-36 bg-gray-50 relative border-b overflow-hidden shrink-0">
-                        {product.image_url ? (
-                          <Image src={product.image_url} alt={product.name} fill className="object-cover group-hover:scale-105 transition duration-300" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-300"><Package className="w-8 h-8" /></div>
-                        )}
-                        <button
-                          onClick={() => setSelectedProduct(product)}
-                          className="absolute bottom-2 right-2 bg-gray-900/80 backdrop-blur-xs text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition shadow text-xs flex items-center gap-1"
-                        >
-                          <Eye className="w-3.5 h-3.5" /> Inspect
-                        </button>
-                      </div>
-                      <div className="p-3.5 flex flex-col flex-grow justify-between space-y-2">
-                        <div>
-                          <span className="text-[9px] font-black text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wider">{product.category}</span>
-                          <h4 className="font-bold text-xs text-gray-800 line-clamp-2 mt-1 min-h-[32px]">{product.name}</h4>
-                        </div>
-                        <div className="space-y-1.5 pt-1">
-                          <div>
-                            <p className="text-xs font-black text-gray-900">{formatPrice(getTieredUnitPrice(product, 1))}</p>
-                            <p className="text-[9px] text-gray-400 font-medium">1-49 Units Base</p>
+              </aside>
+
+              <div className="flex-1">
+                {loading ? (
+                  <div className="text-center py-24 bg-white rounded-xl border border-gray-100">
+                    <RefreshCw className="animate-spin h-8 w-8 text-orange-500 mx-auto mb-2" />
+                    <p className="text-xs font-bold text-gray-400">Synchronizing Live Supabase B2B Warehouses...</p>
+                  </div>
+                ) : inventory.length === 0 ? (
+                  <div className="text-center py-20 bg-white rounded-xl border text-gray-400 text-xs font-medium">No matching factory-direct components verified.</div>
+                ) : (
+                  <>
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {inventory.map((product) => (
+                        <div key={product.id} className="bg-white rounded-xl border border-gray-100 p-3 flex flex-col group relative shadow-xs hover:shadow-md transition">
+                          <div className="absolute top-2 right-2 bg-gray-900/80 backdrop-blur-xs text-orange-400 text-[8px] font-black px-1.5 py-0.5 rounded z-10 tracking-wider uppercase">
+                            Up to 18% Bulk Off
                           </div>
-                          <div className="grid grid-cols-2 gap-1 border-t pt-1.5 text-[9px] text-gray-500">
-                            <div>
-                              <p className="font-extrabold text-gray-700">{formatPrice(getTieredUnitPrice(product, 50))}</p>
-                              <p>50+ Units Tier</p>
-                            </div>
-                            <div className="border-l pl-1">
-                              <p className="font-extrabold text-orange-600">{formatPrice(getTieredUnitPrice(product, 200))}</p>
-                              <p>200+ Container</p>
+
+                          <div className="h-36 w-full bg-gray-50 rounded-lg overflow-hidden relative flex items-center justify-center mb-2">
+                            {product.image_url ? (
+                              <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                            ) : (
+                              <Package className="w-8 h-8 text-gray-300" />
+                            )}
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                              <button onClick={() => setSelectedProduct(product)} className="bg-white text-gray-900 text-[10px] font-black px-2.5 py-1.5 rounded shadow flex items-center gap-1">
+                                <Eye className="w-3.5 h-3.5 text-orange-500" /> Specifications
+                              </button>
                             </div>
                           </div>
+
+                          <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">{product.category}</span>
+                          <h4 className="font-bold text-xs text-gray-900 truncate mt-0.5">{product.name}</h4>
+                          
+                          <div className="mt-2 bg-gray-50 rounded p-1.5 border border-gray-100 text-[10px] space-y-0.5">
+                            <div className="flex justify-between text-gray-500"><span>1-49 units:</span><span className="font-bold text-gray-700">{formatPrice(product.price)}</span></div>
+                            <div className="flex justify-between text-orange-600 font-medium"><span>50-199 units:</span><span>{formatPrice(product.price * 0.9)}</span></div>
+                            <div className="flex justify-between text-green-600 font-bold"><span>200+ units (FOB):</span><span>{formatPrice(product.price * 0.82)}</span></div>
+                          </div>
+
+                          <button
+                            onClick={() => addToCart(product)}
+                            className="mt-3 w-full bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-black py-2 rounded transition flex justify-center items-center gap-1 shadow-sm"
+                          >
+                            <ShoppingCart className="w-3.5 h-3.5" /> Initialize Supply
+                          </button>
                         </div>
-                        <button
-                          onClick={() => addToCart(product)}
-                          className="w-full bg-gray-900 hover:bg-orange-500 text-white text-[10px] font-black py-2 rounded-lg transition uppercase tracking-wider shadow-xs"
-                        >
-                          Queue Cargo Bundle
-                        </button>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
 
-              {totalPages > 1 && (
-                <div className="flex justify-between items-center pt-4 border-t">
-                  <span className="text-xs font-bold text-gray-400">Page {page} of {totalPages} Blocks</span>
-                  <div className="flex gap-1.5">
-                    <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="p-1.5 border rounded-lg bg-white disabled:opacity-40 text-gray-600 hover:bg-gray-50"><ChevronLeft className="w-4 h-4" /></button>
-                    <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="p-1.5 border rounded-lg bg-white disabled:opacity-40 text-gray-600 hover:bg-gray-50"><ChevronRight className="w-4 h-4" /></button>
-                  </div>
-                </div>
-              )}
+                    {totalPages > 1 && (
+                      <div className="mt-8 flex justify-center items-center space-x-1.5 bg-white p-2 border rounded-xl w-fit mx-auto shadow-xs">
+                        <button onClick={() => setPage(p => Math.max(p-1, 1))} disabled={page===1} className="p-1.5 rounded bg-gray-50 disabled:opacity-30"><ChevronLeft className="w-3.5 h-3.5"/></button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(num => (
+                          <button key={num} onClick={() => setPage(num)} className={`w-7 h-7 rounded text-xs font-black transition ${page === num ? "bg-orange-500 text-white" : "bg-gray-50 text-gray-600"}`}>{num}</button>
+                        ))}
+                        <button onClick={() => setPage(p => Math.min(p+1, totalPages))} disabled={page===totalPages} className="p-1.5 rounded bg-gray-50 disabled:opacity-30"><ChevronRight className="w-3.5 h-3.5"/></button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
             </div>
-          </div>
-        </main>
+          </section>
+        </>
       )}
 
-      {/* PRODUCT INSPECT MODAL */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn print:hidden">
-          <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-gray-100 flex flex-col md:flex-row animate-scaleUp">
-            <div className="w-full md:w-1/2 bg-gray-50 relative h-48 md:h-auto border-b md:border-b-0 md:border-r">
-              {selectedProduct.image_url ? (
-                <Image src={selectedProduct.image_url} alt="" fill className="object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-300"><Package className="w-12 h-12" /></div>
-              )}
-            </div>
-            <div className="p-6 md:w-1/2 space-y-4 flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start">
-                  <span className="bg-gray-900 text-orange-400 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">{selectedProduct.category} Material</span>
-                  <button onClick={() => { setSelectedProduct(null); setSingleRfqMessage(""); }} className="text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>
-                </div>
-                <h3 className="text-lg font-black text-gray-900 mt-2">{selectedProduct.name}</h3>
-                <p className="text-[11px] text-gray-400 mt-0.5 font-medium">B2B Tracking Identifier: SKU-{selectedProduct.id?.slice(0, 8).toUpperCase()}</p>
-                <div className="mt-4 bg-gray-50 rounded-xl p-3 border space-y-2 text-xs">
-                  <p className="font-black text-[10px] text-gray-400 uppercase tracking-wider">Wholesale Bracket Pricing Layouts</p>
-                  <div className="flex justify-between items-center"><span>1 - 49 Units (Retail)</span><span className="font-extrabold text-gray-900">{formatPrice(getTieredUnitPrice(selectedProduct, 1))}</span></div>
-                  <div className="flex justify-between items-center text-gray-600"><span>50 - 199 Units (10% Off)</span><span className="font-bold text-gray-900">{formatPrice(getTieredUnitPrice(selectedProduct, 50))}</span></div>
-                  <div className="flex justify-between items-center text-orange-600 font-bold"><span>200+ Units (18% Container)</span><span className="font-black">{formatPrice(getTieredUnitPrice(selectedProduct, 200))}</span></div>
-                </div>
-                <div className="mt-3 text-[11px] text-gray-500 space-y-1">
-                  <p>• Estimated single unit mass payload: ~{getProductWeight(selectedProduct)} KG</p>
-                  <p>• Inspection protocols: Trade Assurance Covered via Tony's Fleet</p>
-                </div>
-              </div>
-              <div className="space-y-2 border-t pt-4">
-                <button
-                  onClick={() => { addToCart(selectedProduct); setSelectedProduct(null); }}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-black py-2.5 rounded-lg uppercase tracking-wider shadow-md transition"
-                >
-                  Allocate Cargo Mass To Cart
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* CART OVERLAY */}
-      {cart.length > 0 && showCartPreview && (
-        <div className="fixed top-0 bottom-0 right-0 w-full max-w-md bg-white shadow-2xl border-l z-50 flex flex-col justify-between animate-slideLeft print:hidden">
-          <div className="p-4 border-b bg-gray-900 text-white flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4 text-orange-400" />
-              <h3 className="font-black text-xs uppercase tracking-wider">Active Procurement Manifest Container</h3>
-            </div>
-            <button onClick={() => setShowCartPreview(false)} className="text-gray-400 hover:text-white p-1 rounded-md bg-gray-800"><X className="w-4 h-4" /></button>
+      {/* OVERLAY FLOATING CART SUMMARY WITH FREIGHT CONTROLS */}
+      {showCartPreview && cart.length > 0 && (
+        <div className="fixed right-4 bottom-4 bg-white border border-gray-200 rounded-xl shadow-2xl max-w-sm w-full p-4 z-50 animate-slideUp print:hidden">
+          <div className="font-black text-xs uppercase tracking-wider text-gray-900 border-b pb-2 mb-3 flex justify-between items-center">
+            <span className="flex items-center gap-1"><ShoppingCart className="w-4 h-4 text-orange-500" /> Active Supply Manifest</span>
+            <button onClick={() => setShowCartPreview(false)} className="text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>
           </div>
 
-          <div className="flex-grow overflow-y-auto p-4 space-y-3 divide-y divide-gray-100">
-            {cart.map((item: any) => {
-              const appliedUnitPrice = getTieredUnitPrice(item, item.quantity);
+          <div className="max-h-36 overflow-y-auto divide-y pr-1 space-y-2">
+            {cart.map(item => {
+              const activeUnitPrice = getTieredUnitPrice(item, item.quantity);
+              const totalDiscountThresholdReached = item.quantity >= 200 ? "Bulk (18% Off)" : item.quantity >= 50 ? "Volume (10% Off)" : "Base Tier";
+              
               return (
-                <div key={item.id} className="pt-3 flex justify-between items-start gap-4 text-xs">
-                  <div className="space-y-1">
-                    <p className="font-black text-gray-900 line-clamp-1">{item.name}</p>
-                    <p className="text-[10px] text-gray-400 font-medium">Mass Parameter Calculation: {getProductWeight(item) * item.quantity} KG Total</p>
-                    <div className="flex items-center bg-gray-100 rounded border w-fit">
-                      <button onClick={() => updateCartQuantity(item.id, -1)} className="px-2 py-0.5 text-gray-600 hover:bg-gray-200 transition font-bold">-</button>
-                      <span className="px-2.5 text-gray-800 font-black text-[11px] bg-white border-x">{item.quantity}</span>
-                      <button onClick={() => updateCartQuantity(item.id, 1)} className="px-2 py-0.5 text-gray-600 hover:bg-gray-200 transition font-bold">+</button>
-                    </div>
+                <div key={item.id} className="pt-2 first:pt-0 text-xs">
+                  <div className="flex justify-between items-start">
+                    <p className="font-bold text-gray-800 truncate max-w-[65%]">{item.name}</p>
+                    <span className="text-[9px] px-1 bg-orange-100 text-orange-800 rounded font-black uppercase tracking-wide">{totalDiscountThresholdReached}</span>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-black text-gray-900">{formatPrice(appliedUnitPrice * item.quantity)}</p>
-                    <p className="text-[9px] text-gray-400 font-bold">@{formatPrice(appliedUnitPrice)}</p>
+                  <div className="flex justify-between items-center mt-1 text-gray-500">
+                    <span>{formatPrice(activeUnitPrice)} unit cost</span>
+                    <div className="flex items-center space-x-1.5 bg-gray-50 p-0.5 rounded border border-gray-100">
+                      <button onClick={() => updateCartQuantity(item.id, -1)} className="px-1 text-gray-400 font-bold hover:text-red-500">-</button>
+                      <span className="font-black text-gray-900">{item.quantity}</span>
+                      <button onClick={() => updateCartQuantity(item.id, 1)} className="px-1 text-gray-400 font-bold hover:text-green-500">+</button>
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <div className="p-4 bg-gray-50 border-t space-y-3.5">
-            <div>
-              <label className="text-[10px] font-black text-gray-500 uppercase block mb-1">Corporate Dispatch Logistics Destination</label>
-              <select
-                className="w-full bg-white border rounded-lg p-2 text-xs text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-orange-500"
-                value={selectedZone}
-                onChange={(e) => setSelectedZone(e.target.value)}
-              >
-                {Object.keys(logisticsZones).map(zone => (
-                  <option key={zone} value={zone}>{zone}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1.5 text-xs border-t pt-3">
-              <div className="flex justify-between text-gray-500"><span>Aggregate Net Load Mass:</span><span className="font-bold text-gray-700">{cartTotalWeight} KG</span></div>
-              <div className="flex justify-between text-gray-500"><span>Wholesale Item Subtotal:</span><span className="font-bold text-gray-900">{formatPrice(totalItemsPriceKES)}</span></div>
-              <div className="flex justify-between text-gray-500"><span>Freight Fleet Surcharge:</span><span className="font-bold text-gray-900">{formatPrice(freightCostKES)}</span></div>
-              <div className="flex justify-between text-gray-500"><span>Corporate VAT Breakdown (16%):</span><span className="font-bold text-gray-900">{formatPrice(aggregateVatKES)}</span></div>
-              <div className="flex justify-between text-sm font-black text-gray-900 border-t pt-2 text-orange-600"><span>Gross Invoice Total:</span><span>{formatPrice(overallInvoiceTotalKES)}</span></div>
-            </div>
-            <button
-              onClick={sendWhatsAppOrder}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs py-3 rounded-lg uppercase tracking-wider shadow-md hover:from-emerald-700 hover:to-teal-700 transition flex justify-center items-center gap-1.5"
+          <div className="mt-4 pt-3 border-t bg-gray-50 p-2 rounded-lg border">
+            <label className="text-[10px] font-black text-gray-600 uppercase tracking-wider block mb-1">Select Freight Dispatch Hub</label>
+            <select 
+              value={selectedZone} 
+              onChange={(e) => setSelectedZone(e.target.value)}
+              className="w-full bg-white text-xs border rounded p-1.5 font-bold outline-none text-gray-800 focus:ring-1 focus:ring-orange-500"
             >
-              <Send className="w-3.5 h-3.5" /> Dispatch Manifest to WhatsApp
-            </button>
+              {Object.keys(logisticsZones).map(zone => (
+                <option key={zone} value={zone}>{zone}</option>
+              ))}
+            </select>
           </div>
+
+          <div className="mt-3 text-xs space-y-1 bg-gray-50/50 p-2 rounded border border-dashed text-gray-600">
+            <div className="flex justify-between"><span>Cargo Payload Mass:</span><span className="font-bold text-gray-900">{cartTotalWeight} KG</span></div>
+            <div className="flex justify-between"><span>Net Goods Cost:</span><span className="font-bold text-gray-900">{formatPrice(totalItemsPriceKES)}</span></div>
+            <div className="flex justify-between"><span>Freight Surcharge:</span><span className="font-bold text-gray-900">{formatPrice(freightCostKES)}</span></div>
+            <div className="flex justify-between border-t pt-1 font-black text-gray-900 text-sm"><span>Invoice Gross:</span><span className="text-orange-600">{formatPrice(overallInvoiceTotalKES)}</span></div>
+          </div>
+
+          <button onClick={sendWhatsAppOrder} className="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 text-xs rounded-lg uppercase tracking-wider transition flex justify-center items-center gap-1.5 shadow">
+            <Phone className="w-4 h-4" /> Dispatch Via WhatsApp
+          </button>
         </div>
       )}
-
-      {/* CHAT WIDGET */}
-      <div className="fixed bottom-4 right-4 z-40 print:hidden">
-        {showChat ? (
-          <div className="bg-white w-80 sm:w-96 h-96 rounded-2xl shadow-2xl border flex flex-col justify-between overflow-hidden animate-scaleUp">
-            <div className="bg-gray-900 p-3.5 text-white flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <div>
-                  <h4 className="font-black text-xs uppercase tracking-wider">Tony's Sourcing Helpdesk</h4>
-                  <p className="text-[9px] text-gray-400">Average response matrix: <span className="text-orange-400 font-bold">Instant</span></p>
-                </div>
-              </div>
-              <button onClick={() => setShowChat(false)} className="text-gray-400 hover:text-white"><X className="w-4 h-4" /></button>
-            </div>
-            <div className="flex-grow p-4 overflow-y-auto space-y-3 bg-gray-50/50 text-xs">
-              {chatMessages.map(m => (
-                <div key={m.id} className={`flex ${m.sender === "buyer" ? "justify-end" : "justify-start"}`}>
-                  <div className={`p-3 rounded-xl max-w-[80%] shadow-xs leading-relaxed ${m.sender === "buyer" ? "bg-orange-500 text-white rounded-br-none" : "bg-white text-gray-800 border rounded-bl-none"}`}>
-                    <p className="font-medium">{m.text}</p>
-                    <span className="block text-[8px] mt-1 text-right opacity-70 font-bold uppercase tracking-widest">{m.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <form onSubmit={executeChatMessageSend} className="p-2 border-t bg-white flex items-center gap-1.5">
-              <input
-                type="text"
-                placeholder="Inquire about custom pricing slots..."
-                className="w-full bg-gray-50 p-2 text-xs rounded-lg focus:outline-none"
-                value={currentMessage}
-                onChange={(e) => setCurrentMessage(e.target.value)}
-              />
-              <button type="submit" className="bg-gray-900 text-white p-2 rounded-lg hover:bg-orange-500 transition"><Send className="w-3.5 h-3.5" /></button>
-            </form>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowChat(true)}
-            className="bg-gray-900 text-white p-3.5 rounded-full shadow-2xl hover:bg-orange-500 transition flex items-center gap-2 group border border-gray-800"
-          >
-            <MessageSquare className="w-5 h-5 text-orange-400" />
-            <span className="text-xs font-black uppercase tracking-wider pr-1 max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300">Live Agent Sourcing Desk</span>
-          </button>
-        )}
-      </div>
 
     </div>
   );
