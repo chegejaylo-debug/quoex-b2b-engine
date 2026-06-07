@@ -229,34 +229,44 @@ export default function AlibabaLayout() {
     return () => subscription?.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single()
-        .then(({ data }) => setProfile(data as UserProfile))
-        .catch(() => setProfile(null));
+ useEffect(() => {
+  if (user) {
+    // Fetch profile
+    const fetchProfile = async () => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
 
-      setOrders([
-        {
-          id: "ORD-2026-A",
-          date: "2026-05-10",
-          total: 145000,
-          status: "Dispatched",
-          items: "Premium Blue Triangle Cement x120 Bags",
-        },
-        {
-          id: "ORD-2026-B",
-          date: "2026-06-02",
-          total: 38400,
-          status: "Processing",
-          items: "Gloss Finish Weatherguard Paint x12 Pails",
-        },
-      ]);
-    }
-  }, [user]);
+        setProfile(data as UserProfile);
+      } catch {
+        setProfile(null);
+      }
+    };
+
+    fetchProfile();
+
+    // Set orders
+    setOrders([
+      {
+        id: "ORD-2026-A",
+        date: "2026-05-10",
+        total: 145000,
+        status: "Dispatched",
+        items: "Premium Blue Triangle Cement x120 Bags",
+      },
+      {
+        id: "ORD-2026-B",
+        date: "2026-06-02",
+        total: 38400,
+        status: "Processing",
+        items: "Gloss Finish Weatherguard Paint x12 Pails",
+      },
+    ]);
+  }
+}, [user]);
 
   // --- Central Query Inventory Master Function ---
   async function fetchProducts(): Promise<void> {
