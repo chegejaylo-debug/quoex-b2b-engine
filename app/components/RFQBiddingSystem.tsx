@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FileText, Clock, TrendingUp, Users, Plus, Send, Award, CheckCircle, AlertCircle } from "lucide-react";
+import { FileText, Clock, TrendingUp, Users, Plus, Send, Award, CheckCircle, AlertCircle, X } from "lucide-react";
 
 interface RFQRequest {
   id: string;
