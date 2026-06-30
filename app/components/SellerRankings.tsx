@@ -79,7 +79,7 @@ export default function SellerRankings() {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm border p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-wrap items-start sm:items-center justify-between mb-4 gap-3">
           <div>
             <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
               <Award className="w-5 h-5 text-orange-500" />
@@ -90,7 +90,7 @@ export default function SellerRankings() {
           <button
             onClick={fetchRankings}
             disabled={loading}
-            className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition flex items-center gap-2"
+            className="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition flex items-center gap-2 shrink-0"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -98,7 +98,7 @@ export default function SellerRankings() {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as 'all' | 'category' | 'region')}

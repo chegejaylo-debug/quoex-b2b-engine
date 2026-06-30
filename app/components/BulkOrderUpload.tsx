@@ -87,8 +87,8 @@ export function BulkOrderUpload({ onUpload, onClose }: BulkOrderUploadProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[90vh] overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">

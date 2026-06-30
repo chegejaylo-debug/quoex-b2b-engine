@@ -370,20 +370,22 @@ export function RFQBiddingSystem({ userRole }: RFQBiddingSystemProps) {
 
             {/* Bids Section */}
             <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-black text-gray-900 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-500" />
-                  Submitted Bids
-                </h4>
-                {userRole === "supplier" && selectedRFQ.status === "open" && !showBidForm && (
-                  <button
-                    onClick={() => setShowBidForm(true)}
-                    className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-black px-4 py-2 rounded-lg transition flex items-center gap-1"
-                  >
-                    <Send className="w-3.5 h-3.5" /> Submit Bid
-                  </button>
-                )}
-              </div>
+        <div className="flex flex-wrap items-start sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h4 className="text-sm font-black text-gray-900 flex items-center gap-2">
+              <Users className="w-4 h-4 text-purple-500" />
+              Submitted Bids
+            </h4>
+          </div>
+          {userRole === "supplier" && selectedRFQ.status === "open" && !showBidForm && (
+            <button
+              onClick={() => setShowBidForm(true)}
+              className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-black px-4 py-2 rounded-lg transition flex items-center gap-1 shrink-0"
+            >
+              <Send className="w-3.5 h-3.5" /> Submit Bid
+            </button>
+          )}
+        </div>
 
               {showBidForm ? (
                 <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 space-y-4">
@@ -504,8 +506,8 @@ export function RFQBiddingSystem({ userRole }: RFQBiddingSystemProps) {
 
       {/* Create RFQ Modal */}
       {showCreateRFQ && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">
                 <Plus className="w-5 h-5 text-orange-500" />
