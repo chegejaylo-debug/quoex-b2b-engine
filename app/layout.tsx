@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Quoex — Enterprise B2B Software Solutions",
@@ -57,8 +70,6 @@ export default function RootLayout({
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="en" className="dark">
         <head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
@@ -79,7 +90,7 @@ export default function RootLayout({
             }}
           />
         </head>
-        <body className="min-h-screen bg-[#05060F] text-[#F0F0FF]">{children}</body>
+        <body className={`min-h-screen bg-[#05060F] text-[#F0F0FF] ${inter.variable} ${plusJakartaSans.variable}`}>{children}</body>
       </html>
     </ClerkProvider>
   );

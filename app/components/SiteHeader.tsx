@@ -64,13 +64,13 @@ export default function SiteHeader() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <button
+              <Link
                 key={link.href}
-                onClick={() => handleNavClick(link.href)}
+                href={link.href.startsWith("#") ? `/${link.href}` : link.href}
                 className="px-4 py-2 text-sm font-medium text-[#A0A3C4] hover:text-white rounded-lg hover:bg-white/5 transition-all"
               >
                 {link.label}
-              </button>
+              </Link>
             ))}
             <Link
               href="/marketplace"
@@ -82,12 +82,12 @@ export default function SiteHeader() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={() => handleNavClick("#contact")}
-              className="btn-brand px-5 py-2.5 rounded-xl text-sm font-semibold"
+            <Link
+              href="/#contact"
+              className="btn-brand px-5 py-2.5 rounded-xl text-sm font-semibold inline-block"
             >
               Start a Project
-            </button>
+            </Link>
           </div>
 
           {/* Mobile hamburger */}
@@ -126,13 +126,14 @@ export default function SiteHeader() {
 
             <nav className="flex flex-col gap-1 flex-1">
               {navLinks.map((link) => (
-                <button
+                <Link
                   key={link.href}
-                  onClick={() => handleNavClick(link.href)}
+                  href={link.href.startsWith("#") ? `/${link.href}` : link.href}
+                  onClick={() => setMobileOpen(false)}
                   className="text-left px-4 py-3 rounded-xl text-base font-medium text-[#A0A3C4] hover:text-white hover:bg-white/5 transition-all"
                 >
                   {link.label}
-                </button>
+                </Link>
               ))}
               <Link
                 href="/marketplace"
@@ -144,12 +145,13 @@ export default function SiteHeader() {
             </nav>
 
             <div className="pt-4 border-t border-white/10 space-y-3">
-              <button
-                onClick={() => handleNavClick("#contact")}
-                className="btn-brand w-full px-5 py-3 rounded-xl text-sm font-semibold text-center"
+              <Link
+                href="/#contact"
+                onClick={() => setMobileOpen(false)}
+                className="btn-brand w-full px-5 py-3 rounded-xl text-sm font-semibold text-center inline-block"
               >
                 Start a Project
-              </button>
+              </Link>
             </div>
           </div>
         </div>

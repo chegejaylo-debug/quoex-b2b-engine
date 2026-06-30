@@ -136,6 +136,7 @@ export async function createMpesaPayment(
   phoneNumber:string
 ){
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const Intasend = require('intasend-node');
 
 
@@ -202,7 +203,7 @@ export async function verifyPayment(
       };
 
 
-    }catch(error){
+    }catch{
 
       return {
         success:false,
@@ -239,7 +240,7 @@ export async function verifyPayment(
       };
 
 
-    }catch(error){
+    }catch{
 
       return {
         success:false,

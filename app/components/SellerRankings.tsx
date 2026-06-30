@@ -22,13 +22,6 @@ export default function SellerRankings() {
   const [filter, setFilter] = useState<'all' | 'category' | 'region'>('all');
   const [filterValue, setFilterValue] = useState<string>('');
 
-  useEffect(() => {
-    fetchRankings();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchRankings, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
   const fetchRankings = async () => {
     try {
       const response = await fetch('/api/rankings');
@@ -42,6 +35,13 @@ export default function SellerRankings() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchRankings();
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchRankings, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-KE', {

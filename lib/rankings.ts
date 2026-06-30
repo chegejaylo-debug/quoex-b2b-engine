@@ -14,7 +14,7 @@ export interface SellerRanking {
 }
 
 // Store previous rankings to calculate rank changes
-let previousRankings: Map<string, number> = new Map();
+const previousRankings: Map<string, number> = new Map();
 
 // Get seller rankings from real database
 export async function getSellerRankings(): Promise<SellerRanking[]> {
@@ -50,7 +50,7 @@ export async function getSellerRankings(): Promise<SellerRanking[]> {
       region?: string;
     }>();
 
-    orders.forEach((order: any) => {
+    orders.forEach((order: { seller_id: string; total: number; seller_name: string }) => {
       const sellerId = order.seller_id || 'unknown';
       const existing = sellerMetrics.get(sellerId);
 
@@ -124,6 +124,7 @@ export async function getSellerRanking(sellerId: string): Promise<SellerRanking 
 }
 
 // Update seller sales - this is handled by the orders table, no separate update needed
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function updateSellerSales(sellerId: string, amount: number): Promise<boolean> {
   try {
     // Sales are updated automatically when orders are created

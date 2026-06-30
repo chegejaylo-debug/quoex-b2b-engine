@@ -86,7 +86,7 @@ export default function TestimonialsSection() {
             <span className="gradient-text">Love Our Work</span>
           </h2>
           <p className="mt-5 text-[#A0A3C4] text-lg leading-relaxed">
-            Don't take our word for it. Here's what the people who hired us have to say.
+            Don&apos;t take our word for it. Here&apos;s what the people who hired us have to say.
           </p>
         </div>
 
@@ -108,7 +108,7 @@ export default function TestimonialsSection() {
               </div>
 
               <p className="text-sm text-[#A0A3C4] leading-relaxed flex-1 mb-6">
-                "{t.text}"
+                &quot;{t.text}&quot;
               </p>
 
               <div className="flex items-center gap-3 pt-4 border-t border-white/7">

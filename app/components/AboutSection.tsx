@@ -80,19 +80,19 @@ export default function AboutSection() {
               <p>
                 <span className="text-white font-bold">Quoex Technologies</span> was born from frustration.
                 We watched African businesses struggle with outdated software, cookie-cutter templates,
-                and overseas developers who didn't understand local market realities.
+                and overseas developers who didn&apos;t understand local market realities.
               </p>
               <p>
                 We set out to build something different — an engineering firm with deep roots in African
                 commerce, a global technology stack, and an uncompromising obsession with quality.
               </p>
               <p>
-                Today we're a tight-knit team of full-stack engineers, UI/UX designers, and product
+                Today we&apos;re a tight-knit team of full-stack engineers, UI/UX designers, and product
                 strategists who have shipped over 50 production platforms for clients across Africa,
                 the Middle East, and beyond.
               </p>
               <p>
-                Every project we take on becomes a personal mission. We don't just build software —
+                Every project we take on becomes a personal mission. We don&apos;t just build software —
                 we build the infrastructure that powers your business growth.
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function AboutSection() {
             <div className="relative">
               <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-[#6C47FF] via-[#FF6B35] to-transparent" />
               <div className="space-y-6">
-                {timeline.map((item, i) => (
+                {timeline.map((item) => (
                   <div key={item.year} className="flex gap-6">
                     <div className="relative shrink-0">
                       <div className="w-10 h-10 rounded-full bg-[#0D0F1E] border-2 border-[#6C47FF] flex items-center justify-center text-[10px] font-black text-[#6C47FF] z-10 relative">

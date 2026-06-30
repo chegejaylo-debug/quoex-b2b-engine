@@ -14,11 +14,11 @@ export default function ContactSection() {
             <span className="text-[#A0A3C4]">Start Your Project</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
-            Let's Build Something{" "}
+            Let&apos;s Build Something{" "}
             <span className="gradient-text">Extraordinary</span>
           </h2>
           <p className="mt-5 text-[#A0A3C4] text-lg leading-relaxed">
-            Fill in your project brief below. We'll review it and send a detailed proposal within 4 hours.
+            Fill in your project brief below. We&apos;ll review it and send a detailed proposal within 4 hours.
           </p>
         </div>
 

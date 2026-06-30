@@ -2,6 +2,10 @@
 
 import { Check, Zap, Building2, Crown, ArrowRight } from "lucide-react";
 
+type PricingSectionProps = {
+  onCTAClick: () => void;
+};
+
 const plans = [
   {
     id: "starter",
@@ -10,7 +14,8 @@ const plans = [
     color: "#6C47FF",
     price: "$2,500",
     period: "project",
-    description: "Perfect for MVPs, landing pages, and small business applications.",
+    description:
+      "Perfect for MVPs, landing pages, and small business applications.",
     features: [
       "Up to 10 core features",
       "Next.js + Supabase stack",
@@ -31,18 +36,19 @@ const plans = [
     color: "#FF6B35",
     price: "$8,500",
     period: "project",
-    description: "Complete B2B platforms, SaaS apps, and production-ready enterprise systems.",
+    description:
+      "Complete B2B platforms, SaaS apps, and production-ready enterprise systems.",
     features: [
       "Unlimited features & modules",
       "Full B2B marketplace setup",
       "Advanced auth & RBAC",
       "AI/LLM integration",
       "All payment gateways",
-      "Real-time features (Supabase)",
+      "Real-time features",
       "Admin dashboard",
       "4 weeks delivery",
       "3 months post-launch support",
-      "SEO & performance optimization",
+      "SEO optimization",
     ],
     cta: "Most Popular — Start Now",
     popular: true,
@@ -54,14 +60,15 @@ const plans = [
     color: "#00D4AA",
     price: "Custom",
     period: "engagement",
-    description: "Long-term partnerships, large-scale platforms, and dedicated development teams.",
+    description:
+      "Long-term partnerships, large-scale platforms, and dedicated development teams.",
     features: [
       "Everything in Professional",
       "Dedicated development team",
       "Custom API integrations",
       "Microservices architecture",
       "DevOps & CI/CD setup",
-      "On-premise or cloud deployment",
+      "Cloud deployment",
       "SLA-backed support",
       "Monthly retainer available",
       "Weekly progress calls",
@@ -81,105 +88,175 @@ const addons = [
   { label: "Mobile App (React Native)", price: "+$4,000" },
 ];
 
-export default function PricingSection({ onCTAClick }: { onCTAClick?: () => void }) {
+
+export default function PricingSection({
+  onCTAClick,
+}: PricingSectionProps) {
+
   return (
-    <section id="pricing" className="relative py-24 bg-[#05060F]">
+    <section
+      id="pricing"
+      className="relative py-24 bg-[#05060F]"
+    >
+
       <div className="absolute inset-0 bg-grid opacity-40" />
 
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Header */}
+
+
         <div className="text-center max-w-3xl mx-auto mb-16">
+
           <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm mb-6">
             <span className="w-2 h-2 rounded-full bg-[#00D4AA]" />
-            <span className="text-[#A0A3C4]">Transparent Pricing</span>
+            <span className="text-[#A0A3C4]">
+              Transparent Pricing
+            </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
+
+
+          <h2 className="text-4xl font-black text-white">
             Investment in Your{" "}
-            <span className="gradient-text">Digital Future</span>
+            <span className="gradient-text">
+              Digital Future
+            </span>
           </h2>
-          <p className="mt-5 text-[#A0A3C4] text-lg leading-relaxed">
-            No hidden fees. Fixed-price projects. Source code ownership. Lifetime support options available.
-          </p>
+
         </div>
 
-        {/* Plans */}
+
+
         <div className="grid md:grid-cols-3 gap-6 mb-16">
-          {plans.map((plan) => {
+
+          {plans.map((plan)=>{
+
             const Icon = plan.icon;
+
             return (
+
               <div
                 key={plan.id}
-                className={`relative rounded-2xl p-6 flex flex-col transition-all duration-300 ${
+                className={`rounded-2xl p-6 flex flex-col ${
                   plan.popular
-                    ? "bg-gradient-to-b from-[#1A1535] to-[#0D0F1E] border-2 border-[#6C47FF]/50 shadow-2xl shadow-[#6C47FF]/20 scale-105"
-                    : "bg-[#0D0F1E] border border-white/7 hover:border-white/15 card-glow"
+                    ? "bg-[#1A1535] border-2 border-[#6C47FF]"
+                    : "bg-[#0D0F1E] border border-white/10"
                 }`}
               >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#6C47FF] to-[#FF6B35] text-white text-xs font-black px-4 py-1.5 rounded-full whitespace-nowrap">
-                    ⭐ Most Popular
-                  </div>
-                )}
 
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: `${plan.color}15`, border: `1px solid ${plan.color}30` }}
-                >
-                  <Icon className="w-5 h-5" style={{ color: plan.color }} />
-                </div>
 
-                <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
-                <p className="text-sm text-[#A0A3C4] mb-5">{plan.description}</p>
+                <Icon
+                  className="w-6 h-6 mb-5"
+                  style={{color:plan.color}}
+                />
+
+
+                <h3 className="text-xl font-bold text-white">
+                  {plan.name}
+                </h3>
+
+
+                <p className="text-sm text-[#A0A3C4] my-4">
+                  {plan.description}
+                </p>
+
 
                 <div className="mb-6">
-                  <span className="text-4xl font-black text-white">{plan.price}</span>
-                  <span className="text-sm text-[#6B6F8E] ml-1">/ {plan.period}</span>
+                  <span className="text-4xl font-black text-white">
+                    {plan.price}
+                  </span>
+                  <span className="text-gray-400">
+                    / {plan.period}
+                  </span>
                 </div>
 
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-[#A0A3C4]">
-                      <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: plan.color }} />
-                      {f}
+
+
+                <ul className="space-y-3 flex-1 mb-8">
+
+                  {plan.features.map((feature)=>(
+
+                    <li
+                      key={feature}
+                      className="flex gap-2 text-sm text-[#A0A3C4]"
+                    >
+
+                      <Check
+                        size={16}
+                        style={{color:plan.color}}
+                      />
+
+                      {feature}
+
                     </li>
+
                   ))}
+
                 </ul>
+
+
 
                 <button
                   onClick={onCTAClick}
-                  className={`w-full py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+                  className={`w-full py-3 rounded-xl font-bold flex justify-center items-center gap-2 ${
                     plan.popular
-                      ? "btn-brand"
-                      : "btn-outline"
+                    ? "btn-brand"
+                    : "btn-outline"
                   }`}
                 >
-                  {plan.cta} <ArrowRight className="w-4 h-4" />
+
+                  {plan.cta}
+
+                  <ArrowRight size={16}/>
+
                 </button>
+
+
               </div>
+
             );
+
           })}
+
         </div>
 
-        {/* Add-ons */}
+
+
         <div className="max-w-3xl mx-auto">
-          <h3 className="text-center text-xl font-bold text-white mb-6">Optional Add-ons</h3>
+
+          <h3 className="text-center text-xl text-white font-bold mb-6">
+            Optional Add-ons
+          </h3>
+
+
           <div className="grid sm:grid-cols-2 gap-3">
-            {addons.map((addon) => (
+
+            {addons.map((addon)=>(
+
               <div
                 key={addon.label}
-                className="flex items-center justify-between glass rounded-xl px-4 py-3"
+                className="glass rounded-xl px-4 py-3 flex justify-between"
               >
-                <span className="text-sm text-[#A0A3C4]">{addon.label}</span>
-                <span className="text-sm font-bold text-[#6C47FF]">{addon.price}</span>
+
+                <span className="text-sm text-[#A0A3C4]">
+                  {addon.label}
+                </span>
+
+                <span className="font-bold text-[#6C47FF]">
+                  {addon.price}
+                </span>
+
               </div>
+
             ))}
+
           </div>
-          <p className="text-center text-xs text-[#6B6F8E] mt-6">
-            All prices in USD. Kenyan clients can pay in KES at current exchange rate.
-            M-Pesa, Stripe, and bank transfer accepted.
-          </p>
+
+
         </div>
+
+
       </div>
+
     </section>
   );
 }

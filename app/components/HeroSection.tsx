@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Play, Star, TrendingUp, Shield, Zap } from "lucide-react";
+import Link from "next/link";
 
 const stats = [
   { value: "50+", label: "Projects Delivered" },
@@ -49,23 +50,20 @@ export default function HeroSection({ onCTAClick }: { onCTAClick?: () => void })
 
           {/* CTA Buttons */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-slideUp delay-300">
-            <button
-              onClick={onCTAClick}
+            <Link
+              href="/#contact"
               className="btn-brand w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 group"
             >
               Start Your Project
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => {
-                const el = document.querySelector("#portfolio");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
+            </Link>
+            <Link
+              href="/#portfolio"
               className="btn-outline w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold flex items-center justify-center gap-2"
             >
               <Play className="w-4 h-4 text-[#6C47FF]" />
               View Our Work
-            </button>
+            </Link>
           </div>
 
           {/* Trust signals */}

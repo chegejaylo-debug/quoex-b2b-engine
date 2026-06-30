@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  User, Mail, Phone, Briefcase, DollarSign,
+  User, Mail, Phone, DollarSign,
   Calendar, FileText, CheckCircle, ArrowRight,
   ArrowLeft, Loader2, Building2, Zap
 } from "lucide-react";
@@ -120,7 +120,7 @@ export default function OnboardingForm() {
         </div>
         <h3 className="text-2xl font-black text-white mb-3">Project Received! 🎉</h3>
         <p className="text-[#A0A3C4] mb-2 max-w-sm mx-auto">
-          Thanks, <strong className="text-white">{form.name}</strong>! We've received your project brief and will send a detailed proposal to <strong className="text-white">{form.email}</strong> within 4 business hours.
+          Thanks, <strong className="text-white">{form.name}</strong>! We&apos;ve received your project brief and will send a detailed proposal to <strong className="text-white">{form.email}</strong> within 4 business hours.
         </p>
         <p className="text-sm text-[#6B6F8E] mt-4">
           In a hurry? WhatsApp us at{" "}
@@ -227,7 +227,7 @@ export default function OnboardingForm() {
                       : "border-white/7 bg-[#0D0F1E] text-[#A0A3C4] hover:border-white/20"
                   }`}
                 >
-                  <div className="text-2xl mb-1.5">{svc.emoji}</div>
+                  <div className="text-2xl mb-1.5">{svc.icon}</div>
                   <div className="text-xs font-semibold">{svc.label}</div>
                 </button>
               ))}
